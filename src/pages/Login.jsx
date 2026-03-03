@@ -17,7 +17,7 @@ const Login = () => {
     handleSubmit,
     formState: { errors, isValid },
   } = useForm({
-    mode: "onChange",
+    mode: "onChange", 
   });
 
   const onSubmit = async (data) => {
