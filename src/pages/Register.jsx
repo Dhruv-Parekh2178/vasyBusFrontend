@@ -113,9 +113,17 @@ const Register = () => {
               {...register("phone", {
                 required: "Phone number is required",
                 pattern: {
-                  value: /^[0-9]{10}$/,
+                  value: /^[6-9][0-9]{9}$/,
+                  message: "Phone number must start with 6,7,8,9 and be exactly 10 digits",
+                },
+                minLength: {
+                  value: 10,
                   message: "Phone must be exactly 10 digits",
                 },
+                maxLength: {
+                  value: 10,
+                  message: "Phone must be exactly 10 digits",
+                }
               })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg 
               focus:outline-none focus:ring-2 focus:ring-blue-500 

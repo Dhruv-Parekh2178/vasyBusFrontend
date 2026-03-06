@@ -1,3 +1,4 @@
+import { logout } from "../redux/authSlice";
 import api from "../utils/api";
 
 const register = async (userData) => {
@@ -10,9 +11,16 @@ const login = async (userData) => {
   return response.data;
 };
 
+const logoutUser = async () => {
+  const response = await api.post("/auth/logout");
+  return response.data;
+};
+
+
 const authService = {
   register,
   login,
+  logoutUser,
 };
 
 export default authService;
