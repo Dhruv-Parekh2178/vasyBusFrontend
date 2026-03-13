@@ -42,7 +42,6 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
     api
       .get(`/routes/cities?query=${encodeURIComponent(debouncedQuery)}`)
       .then((res) => {
-        // ✅ Backend wraps in ApiResponse — actual list is res.data.data
         const cities = res.data?.data || [];
         setSuggestions(cities);
         if (cities.length > 0) {
@@ -78,6 +77,9 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
         {label}
       </label>
       <div className="relative">
+        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">
+          <i className="ri-map-pin-2-line" />
+        </span>
         <input
           ref={inputRef}
           type="text"
@@ -86,15 +88,16 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
           onFocus={() => { if (suggestions.length > 0) { updatePosition(); setShowList(true); } }}
           placeholder={placeholder}
           autoComplete="off"
-          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800
+          className="w-full pl-9 pr-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800
             focus:outline-none focus:border-blue-500 placeholder-gray-400 transition text-sm font-medium"
         />
         {loading && (
-          <div className="absolute right-3 top-3.5 w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-500 animate-spin text-lg">
+            <i className="ri-loader-4-line" />
+          </span>
         )}
       </div>
 
-      {/* Portal — renders into <body>, escapes gradient stacking context entirely */}
       {showList && suggestions.length > 0 && createPortal(
         <ul style={{
           position: "absolute",
@@ -120,7 +123,8 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#eff6ff"}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
             >
-              📍 {city}
+              <i className="ri-map-pin-line" style={{ color: "#3b82f6" }} />
+              {city}
             </li>
           ))}
         </ul>,
@@ -131,13 +135,13 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
 };
 
 const Home = () => {
+  const today = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
   const [source, setSource] = useState("");
   const [destination, setDestination] = useState("");
-  const [travelDate, setTravelDate] = useState("");
+  const [travelDate, setTravelDate] = useState(today);
   const [searching, setSearching] = useState(false);
 
-  const today = new Date().toISOString().split("T")[0];
 
   const swapCities = () => { setSource(destination); setDestination(source); };
 
@@ -154,7 +158,6 @@ const Home = () => {
       const res = await api.get("/schedules/search", {
         params: { source: source.trim(), destination: destination.trim(), travelDate },
       });
-      // ✅ ApiResponse wrapper — actual results are in res.data.data
       const results = res.data?.data;
       if (!results || results.length === 0) {
         toast.info("No buses found for this route and date.");
@@ -170,19 +173,20 @@ const Home = () => {
   };
 
   const features = [
-    { icon: "🗺️", title: "1000+ Routes", desc: "Pan-India coverage across all major cities" },
-    { icon: "💺", title: "Seat Selection", desc: "Choose your preferred window or aisle seat" },
-    { icon: "💳", title: "Secure Payments", desc: "Powered by Stripe — safe & instant" },
-    { icon: "📧", title: "Instant Confirmation", desc: "Get your ticket on email right away" },
-    { icon: "❌", title: "Easy Cancellation", desc: "Cancel anytime and get a quick refund" },
-    { icon: "🎧", title: "24/7 Support", desc: "We're here whenever you need help" },
+    { icon: "ri-route-line",        title: "1000+ Routes",        desc: "Pan-India coverage across all major cities" },
+    { icon: "ri-sofa-fill",         title: "Seat Selection",       desc: "Choose your preferred window or aisle seat" },
+    { icon: "ri-secure-payment-line", title: "Secure Payments",   desc: "Powered by Stripe — safe & instant" },
+    { icon: "ri-mail-check-line",   title: "Instant Confirmation", desc: "Get your ticket on email right away" },
+    { icon: "ri-refund-2-line",     title: "Easy Cancellation",    desc: "Cancel anytime and get a quick refund" },
+    { icon: "ri-headphone-line",    title: "24/7 Support",         desc: "We're here whenever you need help" },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
+
       <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-16 px-4">
         <div className="max-w-4xl mx-auto text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight">  
             Travel Smarter with <span className="text-yellow-300">VasyBus</span>
           </h1>
           <p className="text-blue-100 text-lg">
@@ -193,43 +197,77 @@ const Home = () => {
         <div className="max-w-4xl mx-auto">
           <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-end gap-3">
+
               <CityInput label="From" placeholder="Departure city" value={source} onChange={setSource} onSelect={setSource} />
 
-              <button type="button" onClick={swapCities} title="Swap cities"
-                className="mb-1 p-2.5 rounded-full border-2 border-blue-200 text-blue-500 hover:bg-blue-50 hover:border-blue-500 transition self-end md:self-auto">
-                ⇌
+              <button
+                type="button"
+                onClick={swapCities}
+                title="Swap cities"
+                className="mb-1 p-2.5 rounded-full border-2 border-blue-200 text-blue-500
+                  hover:bg-blue-50 hover:border-blue-500 transition self-end md:self-auto text-xl"
+              >
+                <i className="ri-arrow-left-right-line" />
               </button>
 
               <CityInput label="To" placeholder="Arrival city" value={destination} onChange={setDestination} onSelect={setDestination} />
 
               <div className="flex-1">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Travel Date</label>
-                <input type="date" value={travelDate} min={today}
-                  onChange={(e) => setTravelDate(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800 focus:outline-none focus:border-blue-500 transition text-sm font-medium"
-                />
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  Travel Date
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none">
+                    <i className="ri-calendar-line" />
+                  </span>
+                  <input
+                    type="date"
+                    value={travelDate}
+                    min={today}
+                    onChange={(e) => setTravelDate(e.target.value)}
+                    className="w-full pl-9 pr-4 py-3 border-2 border-gray-200 rounded-xl text-gray-800
+                      focus:outline-none focus:border-blue-500 transition text-sm font-medium"
+                  />
+                </div>
               </div>
 
-              <button type="submit" disabled={searching}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl transition disabled:opacity-60 whitespace-nowrap text-sm shadow-md hover:shadow-lg self-end">
+              <button
+                type="submit"
+                disabled={searching}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3
+                  rounded-xl transition disabled:opacity-60 whitespace-nowrap text-sm
+                  shadow-md hover:shadow-lg self-end flex items-center gap-2"
+              >
                 {searching ? (
-                  <span className="flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
+                  <>
+                    <i className="ri-loader-4-line animate-spin text-base" />
                     Searching...
-                  </span>
-                ) : "🔍 Search Buses"}
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-search-line text-base" />
+                    Search Buses
+                  </>
+                )}
               </button>
             </div>
           </form>
         </div>
       </section>
-
       <section className="max-w-5xl mx-auto px-4 py-16">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-10">Why Travel with VasyBus?</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-10">
+          Why Travel with VasyBus?
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
-            <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition">
-              <div className="text-3xl mb-3">{f.icon}</div>
+            <div
+              key={i}
+              className="bg-white rounded-xl p-6 shadow-sm border border-gray-100
+                hover:shadow-md hover:border-blue-200 transition"
+            >
+              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+                <i className={`${f.icon} text-2xl text-blue-600`} />
+              </div>
               <h3 className="font-bold text-gray-800 mb-1">{f.title}</h3>
               <p className="text-gray-500 text-sm">{f.desc}</p>
             </div>
