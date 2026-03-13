@@ -85,7 +85,7 @@ initialState,
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.error;
+        state.error = action.payload;
       })
 
       .addCase(loginUser.pending, (state) => {
@@ -100,7 +100,7 @@ initialState,
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload.error;
+        state.error = action.payload;
       })
       .addCase(logoutUser.fulfilled, (state) => {
   state.user = null;

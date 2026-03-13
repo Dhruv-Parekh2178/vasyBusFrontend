@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/authSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { sanitizeFormData } from "../utils/sanitize";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -16,28 +18,34 @@ const Login = () => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm({
-    mode: "onChange", 
-  });
+  } = useForm({ mode: "onChange" });
 
   const onSubmit = async (data) => {
-    const resultAction = await dispatch(loginUser(data));
+    // ── Layer 1: Frontend sanitization ──────────────────────────────────────
+    let sanitized;
+    try {
+      sanitized = sanitizeFormData(data);
+    } catch (err) {
+      toast.error(err.message);
+      return;
+    }
+
+    const resultAction = await dispatch(loginUser(sanitized));
 
     if (loginUser.fulfilled.match(resultAction)) {
       navigate("/");
+    } else {
+      toast.error(resultAction.payload || "Login failed");
     }
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
+    if (isAuthenticated) navigate("/");
   }, [isAuthenticated, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-100 to-blue-200">
       <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-blue-100">
-        
         <h2 className="text-3xl font-bold text-center text-blue-600 mb-6">
           Login to VasyBus
         </h2>
@@ -49,7 +57,6 @@ const Login = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-700">
               Email Address
@@ -63,15 +70,13 @@ const Login = () => {
                   message: "Enter a valid email address",
                 },
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Enter your email"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
             )}
           </div>
 
@@ -83,28 +88,23 @@ const Login = () => {
               type="password"
               {...register("password", {
                 required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Password must be at least 8 characters",
-                },
+                minLength: { value: 8, message: "Password must be at least 8 characters" },
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={!isValid || loading}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg 
-            font-semibold hover:bg-blue-700 transition duration-200 
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg
+            font-semibold hover:bg-blue-700 transition duration-200
             disabled:opacity-50"
           >
             {loading ? "Logging in..." : "Login"}
@@ -112,11 +112,8 @@ const Login = () => {
         </form>
 
         <p className="text-sm text-center mt-5 text-gray-600">
-          Don’t have an account?{" "}
-          <Link
-            to="/register"
-            className="text-blue-600 font-semibold hover:underline"
-          >
+          Don't have an account?{" "}
+          <Link to="/register" className="text-blue-600 font-semibold hover:underline">
             Register
           </Link>
         </p>

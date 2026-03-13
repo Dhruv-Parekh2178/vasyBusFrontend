@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../redux/authSlice";
 import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import { sanitizeFormData } from "../utils/sanitize";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -16,27 +18,31 @@ const Register = () => {
     register,
     handleSubmit,
     formState: { errors, isValid },
-  } = useForm({
-    mode: "onChange",
-  });
+  } = useForm({ mode: "onChange" });
 
   const onSubmit = async (data) => {
-    const resultAction = await dispatch(
-      registerUser({
-        ...data,
-        age: Number(data.age),
-      })
-    );
+    // ── Layer 1: Frontend sanitization ──────────────────────────────────────
+    let sanitized;
+    try {
+      sanitized = sanitizeFormData({ ...data, age: Number(data.age) });
+    } catch (err) {
+      toast.error(err.message);
+      return; // ← stop here, never reaches backend
+    }
+
+    // ── Dispatch only if sanitization passed ────────────────────────────────
+    const resultAction = await dispatch(registerUser(sanitized));
 
     if (registerUser.fulfilled.match(resultAction)) {
+      toast.success("Account created! Please login.");
       navigate("/login");
+    } else {
+      toast.error(resultAction.payload || "Registration failed");
     }
   };
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
+    if (isAuthenticated) navigate("/");
   }, [isAuthenticated, navigate]);
 
   return (
@@ -53,7 +59,6 @@ const Register = () => {
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
           <div>
             <label className="block text-sm font-medium mb-1 text-gray-700">
               Full Name
@@ -62,17 +67,11 @@ const Register = () => {
               type="text"
               {...register("name", {
                 required: "Name is required",
-                minLength: {
-                  value: 2,
-                  message: "Minimum 2 characters required",
-                },
-                maxLength: {
-                  value: 30,
-                  message: "Maximum 30 characters allowed",
-                },
+                minLength: { value: 2, message: "Minimum 2 characters required" },
+                maxLength: { value: 30, message: "Maximum 30 characters allowed" },
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Enter your full name"
             />
@@ -89,13 +88,10 @@ const Register = () => {
               type="email"
               {...register("email", {
                 required: "Email is required",
-                pattern: {
-                  value: /^\S+@\S+\.\S+$/,
-                  message: "Enter valid email",
-                },
+                pattern: { value: /^\S+@\S+\.\S+$/, message: "Enter valid email" },
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Enter your email"
             />
@@ -114,19 +110,11 @@ const Register = () => {
                 required: "Phone number is required",
                 pattern: {
                   value: /^[6-9][0-9]{9}$/,
-                  message: "Phone number must start with 6,7,8,9 and be exactly 10 digits",
+                  message: "Must start with 6–9 and be exactly 10 digits",
                 },
-                minLength: {
-                  value: 10,
-                  message: "Phone must be exactly 10 digits",
-                },
-                maxLength: {
-                  value: 10,
-                  message: "Phone must be exactly 10 digits",
-                }
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Enter your phone number"
             />
@@ -143,13 +131,11 @@ const Register = () => {
               type="number"
               {...register("age", {
                 required: "Age is required",
-                min: {
-                  value: 10,
-                  message: "Minimum age is 10",
-                },
+                min: { value: 10, message: "Minimum age is 10" },
+                max: { value: 100, message: "Maximum age is 100" },
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Enter your age"
             />
@@ -166,27 +152,22 @@ const Register = () => {
               type="password"
               {...register("password", {
                 required: "Password is required",
-                minLength: {
-                  value: 8,
-                  message: "Minimum 8 characters required",
-                },
+                minLength: { value: 8, message: "Minimum 8 characters required" },
               })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-blue-500 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg
+              focus:outline-none focus:ring-2 focus:ring-blue-500
               focus:border-blue-500 placeholder-gray-400 transition"
               placeholder="Create a password"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
+              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
 
           <button
             type="submit"
             disabled={!isValid || loading}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold 
+            className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold
             hover:bg-blue-700 transition duration-200 disabled:opacity-50"
           >
             {loading ? "Registering..." : "Register"}
@@ -195,10 +176,7 @@ const Register = () => {
 
         <p className="text-sm text-center mt-5 text-gray-600">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="text-blue-600 font-semibold hover:underline"
-          >
+          <Link to="/login" className="text-blue-600 font-semibold hover:underline">
             Login
           </Link>
         </p>
