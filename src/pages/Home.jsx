@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +24,7 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
 
   const updatePosition = () => {
     if (inputRef.current) {
-      const rect = inputRef.current.getBoundingClientRect();
+      const rect = inputRef.current.getBoundingClientRect(); 
       setDropdownPos({
         top: rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,

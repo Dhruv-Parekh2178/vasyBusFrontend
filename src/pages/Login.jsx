@@ -21,7 +21,7 @@ const Login = () => {
   } = useForm({ mode: "onChange" });
 
   const onSubmit = async (data) => {
-    // ── Layer 1: Frontend sanitization ──────────────────────────────────────
+
     let sanitized;
     try {
       sanitized = sanitizeFormData(data);

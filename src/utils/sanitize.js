@@ -1,6 +1,3 @@
-// ─── Always create a FRESH regex — NEVER use /g flag on a stored pattern ───
-// With /g flag, regex remembers lastIndex and alternates true/false every call!
-
 const getSQLPattern = () =>
   /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|FROM|WHERE|TABLE|INTO|VALUES|JOIN|SCRIPT)\b|--|;|\/\*|\*\/|xp_|'|")/i;
 
@@ -17,8 +14,6 @@ export const containsXSS = (value) => {
   return getXSSPattern().test(value);
 };
 
-// Call this in every form onSubmit BEFORE dispatching
-// Throws an Error with a user-friendly message if bad input found
 export const sanitizeFormData = (data) => {
   const sanitized = {};
 
