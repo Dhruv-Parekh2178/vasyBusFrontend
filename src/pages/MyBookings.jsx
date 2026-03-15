@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMyBookings, cancelBooking as cancelBookingThunk } from "../redux/bookingSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import api from "../utils/api";
 
 const formatTime = (i) =>
   i ? new Date(i).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--";
@@ -71,6 +72,7 @@ const CancelModal = ({ booking, onConfirm, onClose, loading }) => {
         <span className="font-semibold">{formatDate(booking?.travelDate)}</span>?
       </p>
 
+     
       <div className="mb-4">
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
           Reason for cancellation *
@@ -161,6 +163,7 @@ const BookingCard = ({ booking, onCancel }) => {
           </div>
         </div>
 
+       
         <div className="flex flex-wrap gap-3 text-xs text-gray-500">
           <span className="flex items-center gap-1">
             <i className="ri-calendar-line text-gray-400" /> {formatDate(booking.travelDate)}
@@ -175,6 +178,7 @@ const BookingCard = ({ booking, onCancel }) => {
           </span>
         </div>
 
+       
         {isCancelled && booking.cancellationReason && (
           <div className="mt-3 bg-red-50 border border-red-100 rounded-xl px-3 py-2 text-xs text-red-600 flex items-center gap-2">
             <i className="ri-information-line" />
@@ -183,7 +187,7 @@ const BookingCard = ({ booking, onCancel }) => {
         )}
       </div>
 
-      
+     
       {!isCancelled && !isPast && (
         <div className="px-5 pb-4">
           <button
@@ -200,39 +204,26 @@ const BookingCard = ({ booking, onCancel }) => {
 
 const MyBookings = () => {
   const navigate = useNavigate();
-  const [bookings, setBookings]         = useState([]);
-  const [loading, setLoading]           = useState(true);
+  const dispatch = useDispatch();
+  const { myBookings: bookings, loading } = useSelector(s => s.booking);
   const [filter, setFilter]             = useState("ALL");
   const [cancelTarget, setCancelTarget] = useState(null);
   const [cancelling, setCancelling]     = useState(false);
 
-  const fetchBookings = async () => {
-    try {
-      const res = await api.get("/bookings/my-bookings");
-      setBookings(res.data?.data || []);
-    } catch (err) {
-      toast.error(err.response?.data?.data?.message || "Failed to load bookings");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { fetchBookings(); }, []);
+  useEffect(() => { dispatch(fetchMyBookings()); }, [dispatch]);
 
   const handleCancelConfirm = async (reason) => {
     if (!cancelTarget) return;
     setCancelling(true);
-    try {
-      const encodedReason = encodeURIComponent(reason || "Cancelled by user");
-      await api.put(`/bookings/${cancelTarget.bookingId}/cancel?reason=${encodedReason}`);
+    const result = await dispatch(cancelBookingThunk({ bookingId: cancelTarget.bookingId, reason }));
+    if (cancelBookingThunk.fulfilled.match(result)) {
       toast.success("Booking cancelled successfully");
       setCancelTarget(null);
-      fetchBookings();
-    } catch (err) {
-      toast.error(err.response?.data?.data?.message || "Cancellation failed");
-    } finally {
-      setCancelling(false);
+      dispatch(fetchMyBookings()); 
+    } else {
+      toast.error(result.payload || "Cancellation failed");
     }
+    setCancelling(false);
   };
 
   const filters = ["ALL", "CONFIRMED", "PENDING", "CANCELLED"];
@@ -253,6 +244,7 @@ const MyBookings = () => {
   return (
     <div className="min-h-screen bg-gray-50">
 
+  
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-8 px-4">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-2xl font-bold flex items-center gap-2">
@@ -266,6 +258,7 @@ const MyBookings = () => {
 
       <div className="max-w-3xl mx-auto px-4 py-6">
 
+       
         <div className="flex gap-2 mb-5 flex-wrap">
           {filters.map(f => {
             const count = f === "ALL" ? bookings.length : bookings.filter(b => b.bookingStatus === f).length;
@@ -285,6 +278,7 @@ const MyBookings = () => {
           })}
         </div>
 
+        
         {filtered.length === 0 ? (
           <div className="bg-white rounded-2xl border border-gray-100 py-16 text-center">
             <i className="ri-ticket-line text-5xl text-gray-200 block mb-3" />

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { clearCurrentBooking } from "../redux/bookingSlice";
 
 const formatTime = (i) =>
   i ? new Date(i).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--";
@@ -19,21 +21,24 @@ const duration = (dep, arr) => {
 
 const BookingConfirmation = () => {
   const navigate = useNavigate();
-  const [booking, setBooking]   = useState(null);
+  const dispatch = useDispatch();
+  const { currentBooking: booking } = useSelector(s => s.booking);
   const [schedule, setSchedule] = useState(null);
   const [paymentId, setPaymentId] = useState(null);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const rawBooking  = sessionStorage.getItem("currentBooking");
     const rawSchedule = sessionStorage.getItem("selectedSchedule");
-    const pId         = sessionStorage.getItem("paymentIntentId");
+    const pId = sessionStorage.getItem("paymentIntentId");
 
-    if (!rawBooking) { navigate("/"); return; }
+    if (!booking && !initialized) { navigate("/"); return; }
 
-    setBooking(JSON.parse(rawBooking));
-    setSchedule(rawSchedule ? JSON.parse(rawSchedule) : null);
-    setPaymentId(pId);
-  }, [navigate]);
+    if (booking) {
+      setSchedule(rawSchedule ? JSON.parse(rawSchedule) : null);
+      setPaymentId(pId);
+      setInitialized(true);
+    }
+  }, [booking, navigate]);
 
   if (!booking) return null;
 
@@ -41,14 +46,15 @@ const BookingConfirmation = () => {
   const passengers = booking.passengers || [];
 
   const handleNewBooking = () => {
-    sessionStorage.removeItem("currentBooking");
+    navigate("/");
+    dispatch(clearCurrentBooking());
     sessionStorage.removeItem("selectedSchedule");
     sessionStorage.removeItem("paymentIntentId");
-    navigate("/");
   };
 
   const handleViewBookings = () => {
     navigate("/my-bookings");
+    dispatch(clearCurrentBooking());
   };
 
   return (
@@ -75,6 +81,7 @@ const BookingConfirmation = () => {
           <h2 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
             <i className="ri-bus-line text-blue-600" /> Trip Details
           </h2>
+
           <div className="flex items-center justify-between mb-5">
             <div className="text-center">
               <p className="text-2xl font-bold text-gray-800">{b?.sourceCity}</p>
@@ -96,12 +103,11 @@ const BookingConfirmation = () => {
             </div>
           </div>
 
-
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: "ri-calendar-line",   label: "Date",     value: formatDate(b?.travelDate) },
-              { icon: "ri-bus-2-line",      label: "Bus",      value: b?.busName },
-              { icon: "ri-road-map-line",   label: "Type",     value: b?.busType?.replace(/_/g, " ") },
+              { icon: "ri-calendar-line", label: "Date", value: formatDate(b?.travelDate) },
+              { icon: "ri-bus-2-line", label: "Bus", value: b?.busName },
+              { icon: "ri-road-map-line", label: "Type", value: b?.busType?.replace(/_/g, " ") },
               { icon: "ri-money-rupee-circle-line", label: "Amount", value: `₹${Number(b?.totalAmount || 0).toLocaleString("en-IN")}` },
             ].map((item) => (
               <div key={item.label} className="bg-gray-50 rounded-xl p-3">
@@ -150,8 +156,8 @@ const BookingConfirmation = () => {
             {[
               { label: "Payment Status", value: "SUCCESS", green: true },
               { label: "Booking Status", value: "CONFIRMED", green: true },
-              { label: "Amount Paid",    value: `₹${Number(b?.totalAmount || 0).toLocaleString("en-IN")}` },
-              { label: "Payment ID",     value: paymentId ? paymentId.substring(0, 24) + "..." : "--" },
+              { label: "Amount Paid", value: `₹${Number(b?.totalAmount || 0).toLocaleString("en-IN")}` },
+              { label: "Payment ID", value: paymentId ? paymentId.substring(0, 24) + "..." : "--" },
             ].map((row) => (
               <div key={row.label} className="flex justify-between items-center py-1.5 border-b border-gray-50 last:border-0">
                 <span className="text-gray-400">{row.label}</span>
@@ -187,6 +193,7 @@ const BookingConfirmation = () => {
             <i className="ri-home-line" /> Back to Home
           </button>
         </div>
+
       </div>
     </div>
   );
