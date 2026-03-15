@@ -9,6 +9,8 @@ import Payment from "./pages/Payment";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import MyBookings from "./pages/MyBookings";
+import Profile from "./pages/Profile";
+
 
 
 function App() {
@@ -24,6 +26,7 @@ function App() {
         <Route path="/payment"                    element={<ProtectedRoute><Payment /></ProtectedRoute>} />
          <Route path="/booking-confirmation"       element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
            <Route path="/my-bookings"                element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+             <Route path="/profile"                    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
       </Routes>
     </>
   );
