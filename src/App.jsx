@@ -10,7 +10,12 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import MyBookings from "./pages/MyBookings";
 import Profile from "./pages/Profile";
-
+import AdminBookings from "./pages/admin/AdminBookings";
+import AdminBuses from "./pages/admin/AdminBuses";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminRoutes from "./pages/admin/AdminRoutes";
+import AdminSchedules from "./pages/admin/AdminSchedules";
+import AdminRoute from "./components/AdminRoute";
 
 
 function App() {
@@ -27,6 +32,14 @@ function App() {
          <Route path="/booking-confirmation"       element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
            <Route path="/my-bookings"                element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
              <Route path="/profile"                    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
+
+             //admin routes 
+                <Route path="/admin"             element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/buses"       element={<AdminRoute><AdminBuses /></AdminRoute>} />
+        <Route path="/admin/routes"      element={<AdminRoute><AdminRoutes /></AdminRoute>} />
+        <Route path="/admin/schedules"   element={<AdminRoute><AdminSchedules /></AdminRoute>} />
+        <Route path="/admin/bookings"    element={<AdminRoute><AdminBookings /></AdminRoute>} />
       </Routes>
     </>
   );
