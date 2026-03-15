@@ -8,6 +8,7 @@ import SeatSelection from "./pages/SeatSelection";
 import Payment from "./pages/Payment";
 import ProtectedRoute from "./components/ProtectedRoute";
 import BookingConfirmation from "./pages/BookingConfirmation";
+import MyBookings from "./pages/MyBookings";
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="/seat-selection/:scheduleId" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />
         <Route path="/payment"                    element={<ProtectedRoute><Payment /></ProtectedRoute>} />
          <Route path="/booking-confirmation"       element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
+           <Route path="/my-bookings"                element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
       </Routes>
     </>
   );
