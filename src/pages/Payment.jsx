@@ -12,18 +12,15 @@ import {
 import { toast } from "react-toastify";
 import api from "../utils/api";
 
-// ─── Load Stripe (publishable key from backend application.properties) ────────
 const stripePromise = loadStripe(
   "pk_test_51T9iv7ECeOEgUqgfXI1b6SlYnFcPyc1ZBaFDUBhFh0BaKbkFbbzLatVrPbXnpA9NrtehFGbLLsJGDmukeCnnPDDm00KSRtpThn"
 );
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 const formatTime = (i) =>
   i ? new Date(i).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--";
 const formatDate = (d) =>
   d ? new Date(d + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "--";
 
-// ─── Stripe element style ─────────────────────────────────────────────────────
 const stripeElementStyle = {
   style: {
     base: {
@@ -36,7 +33,6 @@ const stripeElementStyle = {
   },
 };
 
-// ─── Inner form (must be inside <Elements>) ───────────────────────────────────
 const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
   const stripe = useStripe();
   const elements = useElements();
@@ -68,7 +64,6 @@ const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
       }
 
       if (paymentIntent.status === "succeeded") {
-        // Save payment intent id for confirmation page
         sessionStorage.setItem("paymentIntentId", paymentIntent.id);
         toast.success("Payment successful! Booking confirmed.");
         navigate("/booking-confirmation");
@@ -84,7 +79,6 @@ const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
   return (
     <div className="space-y-4">
 
-      {/* Cardholder name */}
       <div>
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
           Cardholder Name
@@ -98,7 +92,6 @@ const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
         />
       </div>
 
-      {/* Card Number */}
       <div>
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
           Card Number
@@ -113,8 +106,6 @@ const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
           </div>
         </div>
       </div>
-
-      {/* Expiry + CVC */}
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
@@ -143,15 +134,12 @@ const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
         </div>
       </div>
 
-      {/* Test card hint */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-xs text-blue-700 flex items-start gap-2">
         <i className="ri-information-line text-sm mt-0.5" />
         <div>
           <span className="font-semibold">Test card:</span> 4242 4242 4242 4242 · Any future date · Any 3-digit CVC
         </div>
       </div>
-
-      {/* Pay button */}
       <button
         onClick={handlePay}
         disabled={paying || !stripe || !allReady}
@@ -173,7 +161,6 @@ const CheckoutForm = ({ booking, clientSecret, amountInPaise }) => {
   );
 };
 
-// ─── Main Payment Page ────────────────────────────────────────────────────────
 const Payment = () => {
   const navigate = useNavigate();
 
@@ -182,7 +169,6 @@ const Payment = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [amountInPaise, setAmountInPaise] = useState(0);
   const [loading, setLoading]         = useState(true);
-  // Prevent React StrictMode double-invoke from calling create-intent twice
   const intentCreated = useRef(false);
 
   useEffect(() => {
@@ -199,20 +185,17 @@ const Payment = () => {
     setBooking(bookingData);
     setSchedule(scheduleData);
 
-    // Create Stripe PaymentIntent
     const bookingId = bookingData?.booking?.bookingId;
     if (!bookingId) { toast.error("Invalid booking"); navigate("/"); return; }
 
     api.post("/payments/create-intent", { booking_id: bookingId })
       .then((res) => {
-        // ✅ ApiResponse → res.data.data = PaymentIntentResponse
         const data = res.data?.data;
         setClientSecret(data.clientSecret);
         setAmountInPaise(data.amountInPaise);
       })
       .catch((err) => {
         const status = err.response?.status;
-        // ErrorResponse is wrapped: ApiResponse<ErrorResponse> → .data.data.message
         const msg = err.response?.data?.data?.message || err.response?.data?.message || "Failed to initialize payment";
         console.log("Payment intent error:", status, JSON.stringify(err.response?.data));
         if (status === 409) {
@@ -248,7 +231,6 @@ const Payment = () => {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-5 px-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div>
@@ -268,7 +250,6 @@ const Payment = () => {
 
       <div className="max-w-4xl mx-auto px-4 py-6 flex flex-col lg:flex-row gap-6">
 
-        {/* Left — Stripe Card Form */}
         <div className="flex-1">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-bold text-gray-800 mb-5 flex items-center gap-2">
@@ -284,10 +265,8 @@ const Payment = () => {
           </div>
         </div>
 
-        {/* Right — Booking Summary */}
         <div className="lg:w-80 space-y-4">
 
-          {/* Trip summary */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
               <i className="ri-receipt-line text-blue-600" /> Booking Summary
@@ -328,7 +307,6 @@ const Payment = () => {
             </div>
           </div>
 
-          {/* Passenger list */}
           {passengers.length > 0 && (
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
               <h3 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
@@ -355,7 +333,6 @@ const Payment = () => {
             </div>
           )}
 
-          {/* Security badges */}
           <div className="bg-green-50 border border-green-200 rounded-2xl p-4 space-y-2 text-xs text-green-700">
             {[
               { icon: "ri-shield-check-line", text: "256-bit SSL Encryption" },

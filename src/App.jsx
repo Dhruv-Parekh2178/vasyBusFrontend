@@ -7,6 +7,8 @@ import SearchResults from "./pages/SearchResult";
 import SeatSelection from "./pages/SeatSelection";
 import Payment from "./pages/Payment";
 import ProtectedRoute from "./components/ProtectedRoute";
+import BookingConfirmation from "./pages/BookingConfirmation";
+
 
 function App() {
   return (
@@ -19,6 +21,7 @@ function App() {
         <Route path="/search-results"             element={<SearchResults />} />
         <Route path="/seat-selection/:scheduleId" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />
         <Route path="/payment"                    element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+         <Route path="/booking-confirmation"       element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
       </Routes>
     </>
   );
