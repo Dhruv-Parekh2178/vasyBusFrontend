@@ -21,20 +21,18 @@ const Register = () => {
   } = useForm({ mode: "onChange" });
 
   const onSubmit = async (data) => {
-    // ── Layer 1: Frontend sanitization ──────────────────────────────────────
     let sanitized;
     try {
       sanitized = sanitizeFormData({ ...data, age: Number(data.age) });
     } catch (err) {
       toast.error(err.message);
-      return; // ← stop here, never reaches backend
+      return;
     }
 
-    // ── Dispatch only if sanitization passed ────────────────────────────────
     const resultAction = await dispatch(registerUser(sanitized));
 
     if (registerUser.fulfilled.match(resultAction)) {
-      toast.success("Account created! Please login.");
+      toast.success("Account created!");
       navigate("/login");
     } else {
       toast.error(resultAction.payload || "Registration failed");
