@@ -21,6 +21,7 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   const handleLogout = () => {
@@ -48,6 +49,8 @@ const Navbar = () => {
     <nav className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
+
+
           <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-wide">
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
               <i className="ri-bus-fill text-white text-lg" />
@@ -67,6 +70,7 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
+
           <div className="hidden md:flex items-center gap-3">
             {!isAuthenticated ? (
               <>
@@ -80,6 +84,7 @@ const Navbar = () => {
                 </Link>
               </>
             ) : (
+      
               <div className="relative" ref={dropdownRef}>
                 <button onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 bg-white/15 hover:bg-white/25 px-3 py-2 rounded-xl transition">
@@ -97,7 +102,7 @@ const Navbar = () => {
 
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 overflow-hidden">
-
+          
                     <div className="px-4 py-3 border-b border-gray-50">
                       <p className="font-semibold text-gray-800 text-sm">{user?.name}</p>
                       <p className="text-xs text-gray-400 truncate">{user?.email}</p>
@@ -114,10 +119,16 @@ const Navbar = () => {
                     </Link>
 
                     {isAdmin && (
-                      <Link to="/admin" onClick={() => setDropdownOpen(false)}
-                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
-                        <i className="ri-shield-user-line text-base" /> Admin Panel
-                      </Link>
+                      <>
+                        <Link to="/admin" onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                          <i className="ri-shield-user-line text-base" /> Admin Panel
+                        </Link>
+                        <Link to="/admin/users" onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition">
+                          <i className="ri-group-line text-base" /> User Management
+                        </Link>
+                      </>
                     )}
 
                     <div className="border-t border-gray-100 mt-1 pt-1">
@@ -187,4 +198,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;  
+export default Navbar;

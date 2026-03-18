@@ -151,7 +151,7 @@ const AdminSchedules = () => {
         )}
       </div>
 
-      {/* Add Schedule Modal */}
+   
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">

@@ -71,7 +71,7 @@ const AdminBuses = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-6 px-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
@@ -141,7 +141,6 @@ const AdminBuses = () => {
         )}
       </div>
 
-      {/* Add/Edit Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">

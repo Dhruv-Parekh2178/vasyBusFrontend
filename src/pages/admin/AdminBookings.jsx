@@ -78,7 +78,7 @@ const AdminBookings = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Filters + Search */}
+        
         <div className="flex flex-col sm:flex-row gap-3 mb-5">
           <div className="flex gap-2 flex-wrap">
             {filters.map(f => {
@@ -140,7 +140,6 @@ const AdminBookings = () => {
         )}
       </div>
 
-      {/* Cancel Modal */}
       {cancelTarget && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">

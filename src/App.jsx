@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRoutes from "./pages/admin/AdminRoutes";
 import AdminSchedules from "./pages/admin/AdminSchedules";
 import AdminRoute from "./components/AdminRoute";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 
 function App() {
@@ -23,23 +24,24 @@ function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/"                           element={<Home />} />
-        <Route path="/register"                   element={<Register />} />
-        <Route path="/login"                      element={<Login />} />
-        <Route path="/search-results"             element={<SearchResults />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/search-results" element={<SearchResults />} />
         <Route path="/seat-selection/:scheduleId" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />
-        <Route path="/payment"                    element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-         <Route path="/booking-confirmation"       element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
-           <Route path="/my-bookings"                element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
-             <Route path="/profile"                    element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+         <Route path="/booking-confirmation" element={<ProtectedRoute><BookingConfirmation /></ProtectedRoute>} />
+           <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
 
              //admin routes 
-                <Route path="/admin"             element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/buses"       element={<AdminRoute><AdminBuses /></AdminRoute>} />
-        <Route path="/admin/routes"      element={<AdminRoute><AdminRoutes /></AdminRoute>} />
-        <Route path="/admin/schedules"   element={<AdminRoute><AdminSchedules /></AdminRoute>} />
-        <Route path="/admin/bookings"    element={<AdminRoute><AdminBookings /></AdminRoute>} />
+                <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/buses" element={<AdminRoute><AdminBuses /></AdminRoute>} />
+        <Route path="/admin/routes" element={<AdminRoute><AdminRoutes /></AdminRoute>} />
+        <Route path="/admin/schedules" element={<AdminRoute><AdminSchedules /></AdminRoute>} />
+        <Route path="/admin/bookings" element={<AdminRoute><AdminBookings /></AdminRoute>} />
+         <Route path="/admin/users"       element={<AdminRoute><AdminUsers /></AdminRoute>} />
       </Routes>
     </>
   );

@@ -89,7 +89,7 @@ const AdminRoutes = () => {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* Search */}
+       
         <div className="relative mb-4">
           <i className="ri-search-line absolute left-3 top-3 text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)}

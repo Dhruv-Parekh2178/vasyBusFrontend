@@ -21,7 +21,7 @@ const CityInput = ({ label, placeholder, value, onChange, onSelect }) => {
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef(null);
   const debouncedQuery = useDebounce(value, 300);
-
+ 
   const updatePosition = () => {
     if (inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect(); 
