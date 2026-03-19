@@ -4,8 +4,13 @@ import { fetchMyBookings, cancelBooking as cancelBookingThunk } from "../redux/b
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const formatTime = (i) =>
-  i ? new Date(i).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--";
+const formatTime = (t) => {
+  if (!t) return "--";
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return String(hour12).padStart(2,"0") + ":" + String(m).padStart(2,"0") + " " + ampm;
+};
 
 const formatDate = (d) =>
   d ? new Date(d + "T00:00:00").toLocaleDateString("en-IN", {
@@ -14,8 +19,13 @@ const formatDate = (d) =>
 
 const duration = (dep, arr) => {
   if (!dep || !arr) return "--";
-  const mins = Math.round((new Date(arr) - new Date(dep)) / 60000);
-  return `${Math.floor(mins / 60)}h ${mins % 60}m`;
+  const [dh, dm] = dep.split(":").map(Number);
+  let [ah, am] = arr.split(":").map(Number);
+  let depMins = dh * 60 + dm;
+  let arrMins = ah * 60 + am;
+  if (arrMins < depMins) arrMins += 24 * 60; // overnight trip
+  const diff = arrMins - depMins;
+  return Math.floor(diff / 60) + "h " + (diff % 60) + "m";
 };
 
 const StatusBadge = ({ status, type }) => {

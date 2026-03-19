@@ -12,8 +12,13 @@ import {
   createBooking, clearSelection,
 } from "../redux/bookingSlice";
 
-const formatTime = (i) =>
-  i ? new Date(i).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--";
+const formatTime = (t) => {
+  if (!t) return "--";
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return String(hour12).padStart(2,"0") + ":" + String(m).padStart(2,"0") + " " + ampm;
+};  
 const formatDate = (d) =>
   d ? new Date(d + "T00:00:00").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" }) : "--";
 

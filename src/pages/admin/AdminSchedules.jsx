@@ -6,18 +6,13 @@ import api from "../../utils/api";
 const EMPTY_FORM = { bus_id:"", route_id:"", departure_time:"", arrival_time:"", travel_date:"", price_per_seat:"" };
 
 
-const toUTCString = (localDT) => {
-  if (!localDT) return "";
-  const d = new Date(localDT);
-  return d.getUTCFullYear() + "-" +
-    String(d.getUTCMonth()+1).padStart(2,"0") + "-" +
-    String(d.getUTCDate()).padStart(2,"0") + " " +
-    String(d.getUTCHours()).padStart(2,"0") + ":" +
-    String(d.getUTCMinutes()).padStart(2,"0") + ":00";
+const formatTime = (t) => {
+  if (!t) return "--";
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return String(hour12).padStart(2,"0") + ":" + String(m).padStart(2,"0") + " " + ampm;
 };
-
-const formatTime = (i) =>
-  i ? new Date(i).toLocaleTimeString("en-IN", { hour:"2-digit", minute:"2-digit", hour12:true }) : "--";
 const formatDate = (d) =>
   d ? new Date(d + "T00:00:00").toLocaleDateString("en-IN", { day:"numeric", month:"short", year:"numeric" }) : "--";
 
@@ -59,8 +54,8 @@ const AdminSchedules = () => {
       const payload = {
         bus_id: Number(form.bus_id),
         route_id: Number(form.route_id),
-        departure_time: toUTCString(form.departure_time),
-        arrival_time:   toUTCString(form.arrival_time),
+        departure_time:form.departure_time,
+        arrival_time: form.arrival_time,
         travel_date:    form.travel_date,
         price_per_seat: Number(form.price_per_seat),
       };
@@ -185,12 +180,12 @@ const AdminSchedules = () => {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Departure Time (local)</label>
-                <input type="datetime-local" value={form.departure_time} onChange={e => setForm(p => ({...p, departure_time: e.target.value}))}
+                <input type="time" value={form.departure_time} onChange={e => setForm(p => ({...p, departure_time: e.target.value}))}
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-500 mb-1">Arrival Time (local)</label>
-                <input type="datetime-local" value={form.arrival_time} onChange={e => setForm(p => ({...p, arrival_time: e.target.value}))}
+                <input type="time" value={form.arrival_time} onChange={e => setForm(p => ({...p, arrival_time: e.target.value}))}
                   className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:border-blue-500" />
               </div>
               <div>

@@ -17,8 +17,13 @@ const stripePromise = loadStripe(
   "pk_test_51T9iv7ECeOEgUqgfXI1b6SlYnFcPyc1ZBaFDUBhFh0BaKbkFbbzLatVrPbXnpA9NrtehFGbLLsJGDmukeCnnPDDm00KSRtpThn"
 );
 
-const formatTime = (i) =>
-  i ? new Date(i).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true }) : "--";
+const formatTime = (t) => {
+  if (!t) return "--";
+  const [h, m] = t.split(":").map(Number);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+  return String(hour12).padStart(2,"0") + ":" + String(m).padStart(2,"0") + " " + ampm;
+};
 const formatDate = (d) =>
   d ? new Date(d + "T00:00:00").toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "--";
 
